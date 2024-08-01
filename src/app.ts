@@ -4,7 +4,8 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { StructuredOutputParser } from "@langchain/core/output_parsers";
 import { RunnableSequence, RunnablePassthrough } from '@langchain/core/runnables';
 
-import { openAIFactory } from "./factory/openai";
+import { openAIFactory } from "./factory/implementation/openai/openai";
+import { getQuestionLanguageChain, structuredOutputParser } from './chains/language.chain';
 
 // - Receber o input/query do usuário;
 // - identificar a linguagem da pergunta do usuário;
@@ -16,46 +17,19 @@ import { openAIFactory } from "./factory/openai";
 const app = async () => {
   const model = openAIFactory();
 
-  const findUserLanguageTemplate = ChatPromptTemplate.fromTemplate(`
-    Based on the user's question below, inform the native tongue used. Do NOT answer anything besides the language.
-    User's question: {question},
-    Formatting instructions: {format_instructions}
-    language:
-  `);
-
-  const userChatTemplate = ChatPromptTemplate.fromTemplate(`
-    You're a helpful AI assistant. Based on the provided context and conversation, answer the user's question.
-    Answer the user's question in the following language: {language}
-
-    Chat history: {chat_history}
-
-    Context: {context}
-
-    User's question: {input}
-  `);
-
-
-  // Language chain
-  const languageZodSchema = z.object({ language: z.string().describe(`User's question native tongue language.`) });
-  const structuredOutputParser = StructuredOutputParser.fromZodSchema(languageZodSchema);
-  const findUserLanguageChain = findUserLanguageTemplate
-    .pipe(model)
-    .pipe(structuredOutputParser);
-
-
+  const languageChain = getQuestionLanguageChain(model);
   const runnable = RunnableSequence.from([
     {
       question: new RunnablePassthrough(),
-
     },
     (input) => ({
       question: input.question.input,
       format_instructions: structuredOutputParser.getFormatInstructions(),
     }),
-    findUserLanguageChain
+    languageChain,
   ]);
 
-  const response = await runnable.invoke({ input: 'Olá!!' });
+  const response = await runnable.invoke({ input: 'Hello, how are you?' });
   console.log('response:', response);
 };
 
