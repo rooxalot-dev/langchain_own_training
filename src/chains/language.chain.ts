@@ -12,7 +12,7 @@ export const getQuestionLanguageChain = (model: BaseLanguageModel) => {
     Based on the user's question below, inform the native tongue used.
     Inform the language in lowercase.
     Do NOT answer anything besides the language.
-    User's question: {question},
+    User's question: {input},
     Formatting instructions: {format_instructions}
     language:
   `);
