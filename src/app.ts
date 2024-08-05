@@ -9,6 +9,7 @@ import { getQuestionLanguageChain, structuredOutputParser } from './chains/langu
 import { getVectorStoreContextInfoChain } from './chains/get-vectorestore-context-info.chain';
 import { getSupabaseVectorStore } from './vectorestores/implementation/supabase/supabase';
 import { getPostgresDatasource } from './db/postgres/datasource';
+import { dbAccessChain } from './chains/db-query.chain';
 
 // - Receber o input/query do usuário;
 // - identificar a linguagem da pergunta do usuário;
@@ -18,36 +19,37 @@ import { getPostgresDatasource } from './db/postgres/datasource';
 // - Retornar resposta na lingua do usuário;
 
 const app = async () => {
-  const model = openAIFactory();
+  const model = openAIFactory({ verbose: true });
   const vectorStore = await getSupabaseVectorStore();
   const retriever = await vectorStore.asRetriever();
 
   // const testRetrieverReponse = await retriever.invoke('');
   // console.log('testRetrieverReponse', testRetrieverReponse);
 
-  const languageChain = getQuestionLanguageChain(model);
-  const vectorStoreContextInfoChain = await getVectorStoreContextInfoChain(model, retriever);
+  // const languageChain = getQuestionLanguageChain(model);
+  // const vectorStoreContextInfoChain = await getVectorStoreContextInfoChain(model, retriever);
 
-  const runnable = RunnableSequence.from([
-    (prevInput) => ({
-      input: prevInput.question,
-      format_instructions: structuredOutputParser.getFormatInstructions(),
-    }),
-    // With this method below, we can always send the current runnable response to the overall sequence
-    // Making it possible to access the original unchanged inputs since the first call
-    RunnablePassthrough.assign({
-      language: languageChain,
-    }),
-    RunnablePassthrough.assign({
-      availableContext: vectorStoreContextInfoChain
-    })
-  ]);
+  // const runnable = RunnableSequence.from([
+  //   (prevInput) => ({
+  //     input: prevInput.question,
+  //     format_instructions: structuredOutputParser.getFormatInstructions(),
+  //   }),
+  //   // With this method below, we can always send the current runnable response to the overall sequence
+  //   // Making it possible to access the original unchanged inputs since the first call
+  //   RunnablePassthrough.assign({
+  //     language: languageChain,
+  //   }),
+  //   RunnablePassthrough.assign({
+  //     availableContext: vectorStoreContextInfoChain
+  //   })
+  // ]);
 
   // const response = await runnable.invoke({ question: 'Hello, how are you?' });
   // console.log('response:', response);
 
-  const dataSource = await getPostgresDatasource();
-  console.log(dataSource.allTables.map((t) => t.tableName));
+  const dbQueryChain = await dbAccessChain(model, true);
+  const dbChainResponse = await dbQueryChain.invoke({ question: 'How many states are there per region?' });
+  console.log('dbChainResponse', dbChainResponse);
 };
 
 app();
