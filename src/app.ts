@@ -8,6 +8,7 @@ import { openAIFactory } from "./factory/implementation/openai/openai";
 import { getQuestionLanguageChain, structuredOutputParser } from './chains/language.chain';
 import { getVectorStoreContextInfoChain } from './chains/get-vectorestore-context-info.chain';
 import { getSupabaseVectorStore } from './vectorestores/implementation/supabase/supabase';
+import { getPostgresDatasource } from './db/postgres/datasource';
 
 // - Receber o input/query do usuário;
 // - identificar a linguagem da pergunta do usuário;
@@ -42,8 +43,11 @@ const app = async () => {
     })
   ]);
 
-  const response = await runnable.invoke({ question: 'Hello, how are you?' });
-  console.log('response:', response);
+  // const response = await runnable.invoke({ question: 'Hello, how are you?' });
+  // console.log('response:', response);
+
+  const dataSource = await getPostgresDatasource();
+  console.log(dataSource.allTables.map((t) => t.tableName));
 };
 
 app();

@@ -18,3 +18,6 @@ Steps/Perguntas:
 - Salvar o conteúdo recuperado em base vetorizada;
 - Retornar resposta;
 
+---
+
+Database used for testing (through docker compose): [https://github.com/pthom/northwind_psql]
