@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import * as z from 'zod';
-import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { StructuredOutputParser } from "@langchain/core/output_parsers";
+import { PromptTemplate } from '@langchain/core/prompts';
+import { StringOutputParser, StructuredOutputParser } from "@langchain/core/output_parsers";
 import { RunnableSequence, RunnablePassthrough, } from '@langchain/core/runnables';
 
 import { openAIFactory } from "./factory/implementation/openai/openai";
@@ -19,7 +19,7 @@ import { dbAccessChain } from './chains/db-query.chain';
 // - Retornar resposta na lingua do usuário;
 
 const app = async () => {
-  const model = openAIFactory({ verbose: true });
+  const model = openAIFactory({ });
   const vectorStore = await getSupabaseVectorStore();
   const retriever = await vectorStore.asRetriever();
 
@@ -48,8 +48,26 @@ const app = async () => {
   // console.log('response:', response);
 
   const dbQueryChain = await dbAccessChain(model, true);
-  const dbChainResponse = await dbQueryChain.invoke({ question: 'How many states are there per region?' });
-  console.log('dbChainResponse', dbChainResponse);
+
+  const answerPrompt = PromptTemplate.fromTemplate(`
+    Given the following user question, corresponding SQL query, and SQL result, answer the user question.
+    Question: {question}
+    SQL Result: {result}
+    Answer: `
+  );
+
+  const runnable = RunnableSequence.from([
+    RunnablePassthrough.assign({ question: (input) => input.question }),
+    RunnablePassthrough.assign({
+      result: async (input) => await dbQueryChain.invoke({ question: input.question })
+    }),
+    answerPrompt,
+    model,
+    new StringOutputParser(),
+  ]);
+
+  const dbChainResponse = await runnable.invoke({ question: 'How many states are there per region? Can you detail which ones are they?' });
+  console.log(dbChainResponse);
 };
 
 app();

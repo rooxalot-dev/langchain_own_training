@@ -36,7 +36,7 @@ export const dbAccessChain = async (
     - Using the proper columns for joins
 
     If there are any of the above mistakes, rewrite the query. If there are no mistakes, just reproduce the original query.
-    Don't give any explanations or detials, just return the SQL query and nothing more.
+    Don't give any explanations or detials or commentaries, just return the SQL query and nothing more.
   `;
 
   const queryCheckerSystemPrompt = await ChatPromptTemplate.fromMessages([
