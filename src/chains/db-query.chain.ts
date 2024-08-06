@@ -5,6 +5,7 @@ import { StringOutputParser } from '@langchain/core/output_parsers';
 import { BaseLanguageModel } from '@langchain/core/language_models/base';
 import { createSqlQueryChain, CreateSqlQueryChainFields } from 'langchain/chains/sql_db';
 import { QuerySqlTool, QueryCheckerTool } from 'langchain/tools/sql';
+import {  } from 'langchain/tools/sql';
 
 import { getPostgresDatasource } from "../db/postgres/datasource";
 
@@ -45,6 +46,8 @@ export const dbAccessChain = async (
   ]).partial({ dialect });
 
   const queryCheckChain = queryCheckerSystemPrompt.pipe(model).pipe(new StringOutputParser());
+
+  // End: Rewrite the QueryCheckerTool runnable implementation to provide more details and ensure the returned answer is the query without explanations.
 
   const executeQueryDbTool: QuerySqlTool = new QuerySqlTool(dataSource);
 

@@ -19,7 +19,7 @@ import { dbAccessChain } from './chains/db-query.chain';
 // - Retornar resposta na lingua do usuário;
 
 const app = async () => {
-  const model = openAIFactory({ });
+  const model = openAIFactory({ verbose: true });
   const vectorStore = await getSupabaseVectorStore();
   const retriever = await vectorStore.asRetriever();
 
@@ -66,7 +66,9 @@ const app = async () => {
     new StringOutputParser(),
   ]);
 
-  const dbChainResponse = await runnable.invoke({ question: 'How many states are there per region? Can you detail which ones are they?' });
+  const dbChainResponse = await runnable
+    .invoke({ question: 'Quantos pedidos foram criados para o Brasil no ano de 1996? Liste a quantidade de pedidos pelo nome do cliente e endereço do mesmo' });
+
   console.log(dbChainResponse);
 };
 
