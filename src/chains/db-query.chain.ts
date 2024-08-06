@@ -7,7 +7,7 @@ import { createSqlQueryChain, CreateSqlQueryChainFields } from 'langchain/chains
 import { QuerySqlTool, QueryCheckerTool } from 'langchain/tools/sql';
 import {  } from 'langchain/tools/sql';
 
-import { getPostgresDatasource } from "../db/postgres/datasource";
+import { getPostgresDatasource } from "../db/postgres/sql.database";
 
 export const dbAccessChain = async (
   model: BaseLanguageModel,

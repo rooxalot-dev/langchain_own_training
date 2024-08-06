@@ -5,8 +5,8 @@ type OpenAIConstructorType = Partial<OpenAIChatInput> & BaseChatModelParams;
 
 export const openAIFactory = (config?: OpenAIConstructorType) => {
   const defaultConfig: OpenAIConstructorType = {
-    model: "gpt-3.5-turbo",
-    temperature: 0.7,
+    model: "gpt-4o-mini-2024-07-18",
+    temperature: 0.5,
   };
 
   const model = new ChatOpenAI({ ...defaultConfig, ...config});

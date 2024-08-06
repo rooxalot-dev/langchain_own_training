@@ -8,8 +8,9 @@ import { openAIFactory } from "./factory/implementation/openai/openai";
 import { getQuestionLanguageChain, structuredOutputParser } from './chains/language.chain';
 import { getVectorStoreContextInfoChain } from './chains/get-vectorestore-context-info.chain';
 import { getSupabaseVectorStore } from './vectorestores/implementation/supabase/supabase';
-import { getPostgresDatasource } from './db/postgres/datasource';
+import { getPostgresDatasource } from './db/postgres/sql.database';
 import { dbAccessChain } from './chains/db-query.chain';
+import { getDbAgent, invokeDbAgent } from './agents/db.agent';
 
 // - Receber o input/query do usuário;
 // - identificar a linguagem da pergunta do usuário;
@@ -19,7 +20,7 @@ import { dbAccessChain } from './chains/db-query.chain';
 // - Retornar resposta na lingua do usuário;
 
 const app = async () => {
-  const model = openAIFactory({ verbose: true });
+  const model = openAIFactory({ });
   const vectorStore = await getSupabaseVectorStore();
   const retriever = await vectorStore.asRetriever();
 
@@ -66,10 +67,14 @@ const app = async () => {
     new StringOutputParser(),
   ]);
 
-  const dbChainResponse = await runnable
-    .invoke({ question: 'Quantos pedidos foram criados para o Brasil no ano de 1996? Liste a quantidade de pedidos pelo nome do cliente e endereço do mesmo' });
+  const dbAgent = await getDbAgent(model);
+  //dbAgent.verbose = true;
 
-  console.log(dbChainResponse);
+  const dbChainResponse = await invokeDbAgent(model, `
+      Responda a seguinte pergunta: Quantos pedidos foram criados para o Brasil no ano de 1996? Liste a quantidade de pedidos pelo nome do cliente e endereço do mesmo
+    `);
+
+  console.log('invokeDbAgent', dbChainResponse.output);
 };
 
 app();
