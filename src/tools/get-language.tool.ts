@@ -24,7 +24,7 @@ export const getLanguageTool = () => {
       name: 'get_input_language',
       description: `
         Given the user's input, if the language was not obtained yet, get the message's native language and return it in ISO 639-1 standard code.
-        If this function was already executed and the language was already obtained, do not execute it again.
+        If this function was already executed, the language was already obtained and it's NOT different from the language we're speaking, do not execute it again.
       `,
       schema: languageToolSchema,
     }

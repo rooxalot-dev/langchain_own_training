@@ -1,3 +1,4 @@
+import { tool } from "@langchain/core/tools";
 import { SqlToolkit } from "langchain/agents/toolkits/sql";
 
 import { openAIFactory } from "../factory/implementation/openai/openai";
