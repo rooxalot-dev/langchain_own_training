@@ -5,7 +5,7 @@ import { StringOutputParser, StructuredOutputParser } from "@langchain/core/outp
 import { RunnableSequence, RunnablePassthrough, } from '@langchain/core/runnables';
 
 import { openAIFactory } from "./factory/implementation/openai/openai";
-import { getQuestionLanguageChain, structuredOutputParser } from './chains/language.chain';
+import { getQuestionLanguageChain, languageStructuredOutputParser } from './chains/language.chain';
 import { getVectorStoreContextInfoChain } from './chains/get-vectorestore-context-info.chain';
 import { getSupabaseVectorStore } from './vectorestores/implementation/supabase/supabase';
 import { getPostgresDatasource } from './db/postgres/sql.database';
@@ -33,7 +33,7 @@ const app = async () => {
   // const runnable = RunnableSequence.from([
   //   (prevInput) => ({
   //     input: prevInput.question,
-  //     format_instructions: structuredOutputParser.getFormatInstructions(),
+  //     format_instructions: languageStructuredOutputParser.getFormatInstructions(),
   //   }),
   //   // With this method below, we can always send the current runnable response to the overall sequence
   //   // Making it possible to access the original unchanged inputs since the first call
