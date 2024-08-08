@@ -4,8 +4,8 @@ import { tool } from "@langchain/core/tools";
 import { getQuestionLanguageChain, languageStructuredOutputParser } from "../chains/language.chain";
 import { openAIFactory } from "../factory/implementation/openai/openai";
 
-export const getQueryLanguageTool = () => {
-  const model = openAIFactory({ verbose: false });
+export const getLanguageTool = () => {
+  const model = openAIFactory();
   const languageChain = getQuestionLanguageChain(model);
 
   const languageToolSchema = z.object({

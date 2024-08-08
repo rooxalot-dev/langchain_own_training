@@ -8,7 +8,7 @@ export const openAIFactory = (config?: OpenAIConstructorType) => {
   const defaultConfig: OpenAIConstructorType = {
     model: process.env.OPENAI_MODEL,
     temperature: 0.5,
-    verbose: true,
+    verbose: false,
   };
 
   const model = new ChatOpenAI({ ...defaultConfig, ...config });

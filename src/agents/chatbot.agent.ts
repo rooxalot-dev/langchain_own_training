@@ -2,12 +2,13 @@ import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts
 import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
 
 import { openAIFactory } from "../factory/implementation/openai/openai";
-import { getQueryLanguageTool } from "../tools";
+import { getDbInfoTools, getLanguageTool } from "../tools";
 
 export const getChatbotAgent = async () => {
   // Available tools that should be used automatically by the AI model
   const availableTools = [
-    getQueryLanguageTool(),
+    getLanguageTool(),
+    ...(await getDbInfoTools()),
   ];
 
   const model = openAIFactory();

@@ -4,12 +4,12 @@ import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { BaseLanguageModel } from '@langchain/core/language_models/base';
 import { createSqlQueryChain, CreateSqlQueryChainFields } from 'langchain/chains/sql_db';
-import { QuerySqlTool, QueryCheckerTool } from 'langchain/tools/sql';
+import { QuerySqlTool } from 'langchain/tools/sql';
 import {  } from 'langchain/tools/sql';
 
 import { getPostgresDatasource } from "../db/postgres/sql.database";
 
-export const dbAccessChain = async (
+export const getDbAccessChain = async (
   model: BaseLanguageModel,
   runQuery: boolean = false
 ) => {
@@ -38,6 +38,7 @@ export const dbAccessChain = async (
 
     If there are any of the above mistakes, rewrite the query. If there are no mistakes, just reproduce the original query.
     Don't give any explanations or detials or commentaries, just return the SQL query and nothing more.
+    Return the query in a plain string, without any markdown notations.
   `;
 
   const queryCheckerSystemPrompt = await ChatPromptTemplate.fromMessages([
@@ -46,7 +47,6 @@ export const dbAccessChain = async (
   ]).partial({ dialect });
 
   const queryCheckChain = queryCheckerSystemPrompt.pipe(model).pipe(new StringOutputParser());
-
   // End: Rewrite the QueryCheckerTool runnable implementation to provide more details and ensure the returned answer is the query without explanations.
 
   const executeQueryDbTool: QuerySqlTool = new QuerySqlTool(dataSource);
@@ -54,7 +54,7 @@ export const dbAccessChain = async (
   if (runQuery) {
     return RunnableSequence.from([
       {
-        query: async (input) => sqlQueryChain.invoke(input),
+        query: async (i) => sqlQueryChain.invoke(i),
       },
       queryCheckChain,
       executeQueryDbTool,

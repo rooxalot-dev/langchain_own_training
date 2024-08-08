@@ -18,7 +18,6 @@ import { getChatbotAgent } from './agents/chatbot.agent';
         }
 
         const humanMessage = new HumanMessage(userInput);
-        console.log(`Human: ${humanMessage.content}`);
 
         const response = await chatbotAgentExecutor.invoke({ input: userInput, chat_history: chatHistory });
         const aiMessage = new AIMessage(response.output);
